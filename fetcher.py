@@ -7,6 +7,7 @@ try:
 except:
     print "BeautifulSoup4 is not installed"
 
+import os
 from subprocess import call
 
 
@@ -40,7 +41,7 @@ def download(link,name=None):
             f.write('\n')
         f.close()
         call(["aria2c",'-c','true','-x','16','-j','10','-i','.tmp.txt'])
-        call(["rm",'-rf','.tmp.txt'])
+        os.rmdir('.tmp.txt')
         return 1
     except:
         return 0
