@@ -15,7 +15,8 @@ head_link="http://www.kissanime.com/"
 anime='Anime/'
 anime_name="One-Piece"
 tot_link=head_link+anime+anime_name
-
+complete=False
+latest=True
 
 soup = BS(urllib2.urlopen(tot_link).read())
 
@@ -40,27 +41,34 @@ def download(link,name=None):
             f.write(name)
             f.write('\n')
         f.close()
-        call(["aria2c",'-c','true','-x','16','-j','10','-i','.tmp.txt'])
+        try:
+            call(["aria2c",'-c','true','-x','16','-j','10','-i','.tmp.txt'])
+        except:
+            print "aria2c is not installed"
         os.rmdir('.tmp.txt')
         return 1
     except:
         return 0
 
-#print len(rows)
-for i in rows:
-    #print "#########"
-    #print i['href']
-    #print i['title']
-    #print i.contents[0].strip()
-    link= head_link+i['href']
+if complete==True:
+    for i in rows:
+        #print i['href']
+        #print i['title']
+        #print i.contents[0].strip()
+        link= head_link+i['href']
+        data=soup = BS(urllib2.urlopen(link).read())
+        dlinks=data.find('div',{'id':'divDownload'})
+        link=dlinks.find('a')
+        file_name=i.contents[0].strip()+'_'+link.contents[0]
+        print "downloading ... %s " % file_name 
+        download(link['href'],file_name)
+
+if latest==True:
+    episode=rows[-1:][0]
+    link= head_link+episode['href']
     data=soup = BS(urllib2.urlopen(link).read())
     dlinks=data.find('div',{'id':'divDownload'})
-    #print dlinks
     link=dlinks.find('a')
-    #print link.contents[0]
-    #print link['href']
-    file_name=i.contents[0].strip()+'_'+link.contents[0]
-    #print file_name
+    file_name=episode.contents[0].strip()+'_'+link.contents[0]
     print "downloading ... %s " % file_name 
-    #print link['href']
     download(link['href'],file_name)
