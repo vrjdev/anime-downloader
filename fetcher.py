@@ -5,7 +5,7 @@ except:
 try:
     from bs4 import BeautifulSoup as BS
 except:
-    print "BeautifulSoup4 is not installed"
+    print "BeautifulSoup4 is not installed , try sudo pip install BeautifulSoup4"
 
 import os
 import sys
@@ -66,7 +66,7 @@ def download(link,name=None):
         try:
             call(["aria2c",'-c','true','-x','16','-j','10','-i','.tmp.txt'])
         except:
-            print "aria2c is not installed"
+            print "aria2c is not installed , try sudo apt-get install aria2"
         os.rmdir('.tmp.txt')
         return 1
     except:
