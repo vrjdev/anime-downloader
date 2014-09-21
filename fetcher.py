@@ -1,8 +1,14 @@
-from bs4 import BeautifulSoup as BS
-import urllib2
-import wget
+try:
+    import urllib2
+except:
+    print "urllib2 is not installed"
+try:
+    from bs4 import BeautifulSoup as BS
+except:
+    print "BeautifulSoup4 is not installed"
 
 from subprocess import call
+
 
 head_link="http://www.kissanime.com/"
 anime='Anime/'
@@ -22,6 +28,23 @@ for r in table.findAll("tr")[1:]:
 rows=rows[::-1][:-1]
 
 
+
+def download(link,name=None):
+    try:
+        f=open('.tmp.txt','w')
+        f.write(link)
+        f.write('\n')
+        if name !=None:
+            f.write(' out=')
+            f.write(name)
+            f.write('\n')
+        f.close()
+        call(["aria2c",'-c','true','-x','16','-j','10','-i','.tmp.txt'])
+        call(["rm",'-rf','.tmp.txt'])
+        return 1
+    except:
+        return 0
+
 #print len(rows)
 for i in rows:
     #print "#########"
@@ -37,45 +60,6 @@ for i in rows:
     #print link['href']
     file_name=i.contents[0].strip()+'_'+link.contents[0]
     #print file_name
-    print "downloading ... %s" , file_name
-    """
-    call(["wget", link['href'],'-O',file_name])
-    """
-    
-    """
-    download_file = urllib2.urlopen(link['href'])
-    output = open(file_name,'wb')
-    output.write(download_file.read())
-    output.close()
-    
-    """
-    
-    """
-    url = link['href']
-    
-    u = urllib2.urlopen(url)
-    f = open(file_name, 'wb')
-    meta = u.info()
-    file_size = int(meta.getheaders("Content-Length")[0])
-    print "Downloading: %s Bytes: %s" % (file_name, file_size)
-    
-    file_size_dl = 0
-    block_sz = 8192
-    while True:
-        buffer = u.read(block_sz)
-        if not buffer:
-            break
-    
-        file_size_dl += len(buffer)
-        f.write(buffer)
-        status = r"%10d  [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
-        status = status + chr(8)*(len(status)+1)
-        print status,
-    
-    f.close()
-    """
-    wget.download(link['href'],file_name)
-    
-
-
-
+    print "downloading ... %s " % file_name 
+    #print link['href']
+    download(link['href'],file_name)
