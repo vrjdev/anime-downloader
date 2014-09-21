@@ -8,15 +8,37 @@ except:
     print "BeautifulSoup4 is not installed"
 
 import os
+import sys
 from subprocess import call
 
 
-head_link="http://www.kissanime.com/"
-anime='Anime/'
-anime_name="One-Piece"
-tot_link=head_link+anime+anime_name
+
+
+com_link="http://www.kissanime.com/Anime/One-Piece"
+com_link="http://kissanime.com/Anime/Hunter-x-Hunter-2011"
+
+if com_link.endswith('/'):
+    com_link=com_link[:-1]
+folder_name=com_link.split('/')[-1:][0]
+
+
 complete=False
-latest=True
+
+latest=False
+
+last_x=True
+last_num=10
+
+
+from urlparse import urlparse
+parsed_uri = urlparse( com_link )
+domain = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
+
+head_link=domain
+
+
+
+tot_link=com_link
 
 soup = BS(urllib2.urlopen(tot_link).read())
 
@@ -38,7 +60,7 @@ def download(link,name=None):
         f.write('\n')
         if name !=None:
             f.write(' out=')
-            f.write(name)
+            f.write(folder_name+'/'+name)
             f.write('\n')
         f.close()
         try:
@@ -62,8 +84,7 @@ if complete==True:
         file_name=i.contents[0].strip()+'_'+link.contents[0]
         print "downloading ... %s " % file_name 
         download(link['href'],file_name)
-
-if latest==True:
+elif latest==True:
     episode=rows[-1:][0]
     link= head_link+episode['href']
     data=soup = BS(urllib2.urlopen(link).read())
@@ -72,3 +93,16 @@ if latest==True:
     file_name=episode.contents[0].strip()+'_'+link.contents[0]
     print "downloading ... %s " % file_name 
     download(link['href'],file_name)
+elif last_x==True:
+    episodes=rows[-last_num:]
+    for i in episodes:
+        #print i['href']
+        #print i['title']
+        #print i.contents[0].strip()
+        link= head_link+i['href']
+        data=soup = BS(urllib2.urlopen(link).read())
+        dlinks=data.find('div',{'id':'divDownload'})
+        link=dlinks.find('a')
+        file_name=i.contents[0].strip()+'_'+link.contents[0]
+        print "downloading ... %s " % file_name 
+        download(link['href'],file_name)
